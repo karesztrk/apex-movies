@@ -1,8 +1,8 @@
 import { useSearchContext } from '@/context/SearchContext';
-import { Button, Card, CardActions, CardContent, CardMedia, Link, Rating, Typography } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardMedia, Link, Rating, styled, Typography } from '@mui/material';
 import { FC, useState } from 'react';
-import { Movie } from './SearchResults';
-import { findImdb, findWiki, ImdbPage, WikiPage } from './SearchResults.helper';
+import { Movie } from '.';
+import { findImdb, findWiki, ImdbPage, WikiPage } from './Search.helper';
 
 interface SearchResultProps {
     movie: Movie;
@@ -11,7 +11,7 @@ interface SearchResultProps {
 const SearchResult: FC<SearchResultProps> = ({ movie }) => {
     const [wiki, setWiki] = useState<WikiPage>();
     const [imdb, setImdb] = useState<ImdbPage>();
-    const { updateRelatedMode, updateSelectedMovie } = useSearchContext();
+    const { updateRelatedMode, updateSelectedMovie, updateSearchQuery } = useSearchContext();
 
     const onTitleClick = () => {
         const release = new Date(movie.releaseDate);
@@ -24,7 +24,7 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
     };
 
     const onRelatedClick = () => {
-        if (updateRelatedMode && updateSelectedMovie) {
+        if (updateRelatedMode && updateSelectedMovie && updateSearchQuery) {
             updateRelatedMode(true);
             updateSelectedMovie(movie);
         }
@@ -40,7 +40,7 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
                     {movie.name}
                 </Typography>
                 <Rating name="read-only" value={rating} readOnly />
-                {wiki?.extract && <Typography>{wiki?.extract}</Typography>}
+                {wiki?.extract && <Summary>{wiki?.extract}</Summary>}
             </CardContent>
             {(wiki?.pageid || imdb?.id) && (
                 <CardActions>
@@ -60,5 +60,13 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
         </Card>
     );
 };
+
+const Summary = styled(Typography)(() => ({
+    textAlign: 'center',
+    display: '-webkit-box',
+    WebkitLineClamp: '5',
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+}));
 
 export default SearchResult;

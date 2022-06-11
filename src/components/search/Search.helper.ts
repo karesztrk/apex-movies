@@ -17,15 +17,6 @@ export const findWiki = (name: string): Promise<WikiPage> => {
         return Promise.reject('No name provided');
     }
 
-    // const params = {
-    //     origin: '*',
-    //     action: 'query',
-    //     list: 'search',
-    //     srsearch: name,
-    //     srlimit: '1',
-    //     format: 'json',
-    //     prop: 'extracts',
-    // };
     const params = {
         origin: '*',
         format: 'json',
