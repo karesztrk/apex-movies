@@ -1,58 +1,16 @@
 import { useSearchContext } from '@/context/SearchContext';
+import { useRelatedMovies } from '@/hooks/use-related-movies';
 import { Button, styled, Typography } from '@mui/material';
-import request, { RequestDocument } from 'graphql-request';
 import { PropsWithChildren, useState } from 'react';
-import useSWR from 'swr';
-import { Movie } from '.';
 import SearchBar from './SearchBar';
 import SearchResults from './SearchResults';
-
-interface Result {
-    movie: Movie;
-}
-
-interface QueryVariables {
-    id: string;
-}
-
-const fetcher = (query: RequestDocument, variables: QueryVariables) =>
-    request(`${import.meta.env.VITE_API_URL}`, query, variables);
-
-const relatedMoviesQuery = `
-query getMovie($id: ID!) {
-  movie(id: $id) {
-    id
-    name
-    score
-    releaseDate
-    poster {
-      medium
-    }
-    recommended { 
-      id
-      name
-      score
-      releaseDate
-      poster {
-        medium
-      }
-    }
-  }
-}
-`;
 
 const SearchRelatedView = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const { selectedMovie, updateRelatedMode, updateSelectedMovie } = useSearchContext();
 
-    const variables: QueryVariables = {
-        id: selectedMovie.id,
-    };
-
-    const fetchKey = selectedMovie ? [relatedMoviesQuery, variables] : null;
-
-    const { data } = useSWR<Result>(fetchKey, fetcher);
+    const { data } = useRelatedMovies(selectedMovie);
 
     const movies =
         data?.movie?.recommended?.filter((movie) =>

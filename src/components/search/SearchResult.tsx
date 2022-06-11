@@ -1,26 +1,23 @@
 import { useSearchContext } from '@/context/SearchContext';
+import { useImdb } from '@/hooks/use-imdb';
+import { useWiki } from '@/hooks/use-wiki';
 import { Button, Card, CardActions, CardContent, CardMedia, Link, Rating, styled, Typography } from '@mui/material';
 import { FC, useState } from 'react';
 import { Movie } from '.';
-import { findImdb, findWiki, ImdbPage, WikiPage } from './Search.helper';
 
 interface SearchResultProps {
     movie: Movie;
 }
 
 const SearchResult: FC<SearchResultProps> = ({ movie }) => {
-    const [wiki, setWiki] = useState<WikiPage>();
-    const [imdb, setImdb] = useState<ImdbPage>();
     const { updateRelatedMode, updateSelectedMovie, updateSearchQuery } = useSearchContext();
+    const [open, setOpen] = useState(false);
+
+    const { data: wiki } = useWiki(open ? movie.name : undefined);
+    const { data: imdb } = useImdb(open ? movie.name : undefined, open ? new Date(movie.releaseDate) : undefined);
 
     const onTitleClick = () => {
-        const release = new Date(movie.releaseDate);
-        if (!wiki) {
-            findWiki(movie.name).then(setWiki);
-        }
-        if (!imdb) {
-            findImdb(movie.name, release).then(setImdb);
-        }
+        setOpen(!open);
     };
 
     const onRelatedClick = () => {
