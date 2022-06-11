@@ -1,37 +1,47 @@
 import { useSearchContext } from '@/context/SearchContext';
 import useDebounce from '@/hooks/use-debounce';
-import { Button, Card, CardActions, CardContent, CardMedia, Grid, Typography } from '@mui/material';
+import { Grid } from '@mui/material';
 import request, { RequestDocument } from 'graphql-request';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import useSWR from 'swr';
+import SearchResult from './SearchResult';
 
-interface Movie {
+export interface Movie {
     id: string;
     name: string;
-    overview: string;
-    releaseDate: Date;
+    score: number;
+    releaseDate: string;
     poster: {
         medium: string;
     };
+    recommended?: Movie[];
 }
 
 interface Result {
     searchMovies: Movie[];
 }
 
+interface RelatedMovieResult {
+    movie: Movie;
+}
+
 interface QueryVariables {
     name: string;
+}
+
+interface RelatedMovieQueryVariables {
+    id: string;
 }
 
 const fetcher = (query: RequestDocument, variables: QueryVariables) =>
     request(`${import.meta.env.VITE_API_URL}`, query, variables);
 
-const discoverMoviesQuery = `
+const searchMoviesQuery = `
 query SearchMovies($name: String!) {
   searchMovies(query: $name) {
     id
     name
-    overview
+    score
     releaseDate
     poster {
       medium
@@ -40,40 +50,70 @@ query SearchMovies($name: String!) {
 }
 `;
 
+const relatedMoviesQuery = `
+query getMovie($id: ID!) {
+  movie(id: $id) {
+    id
+    name
+    score
+    releaseDate
+    poster {
+      medium
+    }
+    recommended { 
+      id
+      name
+      score
+      releaseDate
+      poster {
+        medium
+      }
+    }
+  }
+}
+`;
+
 const SearchResults = () => {
-    const { searchQuery } = useSearchContext();
+    const { searchQuery, relatedMode, selectedMovie } = useSearchContext();
 
     const debouncedSearchQuery = useDebounce<string>(searchQuery, 1000);
 
-    const variables: QueryVariables = useMemo(
-        () => ({
+    const variables: QueryVariables | RelatedMovieQueryVariables = useMemo(() => {
+        if (relatedMode && selectedMovie) {
+            return {
+                id: selectedMovie.id,
+            };
+        }
+        return {
             name: debouncedSearchQuery,
-        }),
-        [debouncedSearchQuery],
-    );
+        };
+    }, [debouncedSearchQuery, relatedMode, selectedMovie]);
 
-    const fetchKey = debouncedSearchQuery ? [discoverMoviesQuery, variables] : null;
+    const fetchKey = useMemo(() => {
+        if (relatedMode && selectedMovie) {
+            return [relatedMoviesQuery, variables];
+        }
 
-    const { data } = useSWR<Result>(fetchKey, fetcher);
-    const movies = data?.searchMovies || [];
+        return debouncedSearchQuery ? [searchMoviesQuery, variables] : null;
+    }, [debouncedSearchQuery, searchMoviesQuery, variables, relatedMode, selectedMovie]);
+
+    const { data } = useSWR<Result | RelatedMovieResult>(fetchKey, fetcher);
+
+    const movies = useMemo(() => {
+        if (relatedMode && data && 'movie' in data) {
+            return data.movie.recommended;
+        } else if (!relatedMode && data && 'searchMovies' in data) {
+            return data.searchMovies;
+        } else {
+            return [];
+        }
+    }, [data, relatedMode]);
 
     return (
         <Grid container spacing={4}>
-            {movies.map((movie) => (
+            {movies?.map((movie) => (
                 <Grid item key={movie.id} xs={12} sm={6} md={4}>
-                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <CardMedia component="img" image={movie.poster?.medium} alt="random" />
-                        <CardContent sx={{ flexGrow: 1 }}>
-                            <Typography gutterBottom variant="h5" component="h2">
-                                {movie.name}
-                            </Typography>
-                            <Typography>{movie.overview}</Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button size="small">View</Button>
-                            <Button size="small">Edit</Button>
-                        </CardActions>
-                    </Card>
+                    <SearchResult movie={movie} />
                 </Grid>
             ))}
         </Grid>
