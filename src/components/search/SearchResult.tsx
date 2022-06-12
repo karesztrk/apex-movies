@@ -1,9 +1,8 @@
 import { useSearchContext } from '@/context/SearchContext';
 import { useImdb } from '@/hooks/use-imdb';
 import { useWiki } from '@/hooks/use-wiki';
-import { SavedSearch as SavedSearchIcon, Public as PublicIcon, Movie as MovieIcon } from '@mui/icons-material';
+import { Movie as MovieIcon, Public as PublicIcon, SavedSearch as SavedSearchIcon } from '@mui/icons-material';
 import {
-    Button,
     Card,
     CardActionArea,
     CardActions,
@@ -50,6 +49,53 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
             .map((_, i) => <Skeleton key={i} variant="text" width="100%" />);
     };
 
+    const renderActions = () => (
+        <CardActions>
+            <Tooltip title="Search related movies">
+                <IconButton
+                    color="secondary"
+                    aria-label="Search related movies"
+                    component="span"
+                    onClick={onRelatedClick}
+                >
+                    <SavedSearchIcon />
+                </IconButton>
+            </Tooltip>
+            {wiki === undefined ? (
+                <Skeleton variant="circular" width={25} height={25} />
+            ) : (
+                <Tooltip title="Go to Wikipedia">
+                    <IconButton
+                        component={Link}
+                        target="_blank"
+                        rel="noreferrer"
+                        color="secondary"
+                        aria-label="Go to Wikipedia"
+                        href={`https://en.wikipedia.org/?curid=${wiki.pageid}`}
+                    >
+                        <PublicIcon />
+                    </IconButton>
+                </Tooltip>
+            )}
+            {imdb === undefined ? (
+                <Skeleton variant="circular" width={25} height={25} />
+            ) : (
+                <Tooltip title="Go to IMDB">
+                    <IconButton
+                        component={Link}
+                        color="secondary"
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="Go to IMDB"
+                        href={`https://www.imdb.com/title/${imdb.id}`}
+                    >
+                        <MovieIcon />
+                    </IconButton>
+                </Tooltip>
+            )}
+        </CardActions>
+    );
+
     return (
         <Wrapper>
             <CardActionArea onClick={onClick}>
@@ -60,52 +106,7 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
                     {open && wiki === undefined ? renderSummarySkeleton() : <Summary>{wiki?.extract}</Summary>}
                 </CardContent>
             </CardActionArea>
-            {open && (
-                <CardActions>
-                    <Tooltip title="Search related movies">
-                        <IconButton
-                            color="secondary"
-                            aria-label="Search related movies"
-                            component="span"
-                            onClick={onRelatedClick}
-                        >
-                            <SavedSearchIcon />
-                        </IconButton>
-                    </Tooltip>
-                    {wiki === undefined ? (
-                        <Skeleton variant="circular" width={25} height={25} />
-                    ) : (
-                        <Tooltip title="Go to Wikipedia">
-                            <IconButton
-                                component={Link}
-                                target="_blank"
-                                rel="noreferrer"
-                                color="secondary"
-                                aria-label="Go to Wikipedia"
-                                href={`https://en.wikipedia.org/?curid=${wiki.pageid}`}
-                            >
-                                <PublicIcon />
-                            </IconButton>
-                        </Tooltip>
-                    )}
-                    {imdb === undefined ? (
-                        <Skeleton variant="circular" width={25} height={25} />
-                    ) : (
-                        <Tooltip title="Go to IMDB">
-                            <IconButton
-                                component={Link}
-                                color="secondary"
-                                target="_blank"
-                                rel="noreferrer"
-                                aria-label="Go to IMDB"
-                                href={`https://www.imdb.com/title/${imdb.id}`}
-                            >
-                                <MovieIcon />
-                            </IconButton>
-                        </Tooltip>
-                    )}
-                </CardActions>
-            )}
+            {open && renderActions()}
         </Wrapper>
     );
 };
