@@ -2,7 +2,7 @@ import { useSearchContext } from '@/context/SearchContext';
 import { useImdb } from '@/hooks/use-imdb';
 import { useWiki } from '@/hooks/use-wiki';
 import { Button, Card, CardActions, CardContent, CardMedia, Link, Rating, styled, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, PropsWithChildren, useState } from 'react';
 import { Movie } from '.';
 
 interface SearchResultProps {
@@ -30,10 +30,10 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
     const rating = movie.score / 2;
 
     return (
-        <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <CardMedia component="img" image={movie.poster?.medium} alt="random" />
-            <CardContent sx={{ flexGrow: 1 }}>
-                <Typography gutterBottom variant="h5" component="h2" onClick={onTitleClick}>
+        <Wrapper>
+            <CardMedia component="img" image={movie.poster?.medium} alt="Movie poster" />
+            <CardContent>
+                <Typography variant="h5" component="h2" onClick={onTitleClick}>
                     {movie.name}
                 </Typography>
                 <Rating name="read-only" value={rating} readOnly />
@@ -54,9 +54,17 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
                     )}
                 </CardActions>
             )}
-        </Card>
+        </Wrapper>
     );
 };
+
+const Wrapper = styled(({ children, className }: PropsWithChildren<{ className?: string }>) => (
+    <Card elevation={1} className={className}>
+        {children}
+    </Card>
+))(() => ({
+    borderRadius: '0.75rem',
+}));
 
 const Summary = styled(Typography)(() => ({
     textAlign: 'center',
