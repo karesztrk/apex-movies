@@ -15,7 +15,6 @@ export interface ImdbPage {
 }
 
 const apiFetcher = (query: RequestDocument, variables: unknown) => {
-    console.log('calling');
     return request(`${import.meta.env.VITE_API_URL}`, query, variables);
 };
 

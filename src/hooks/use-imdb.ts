@@ -1,8 +1,8 @@
 import { imdbFetcher } from '@/util/fetcher';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 export const useImdb = (name?: string, releaseDate?: Date) => {
-    return useSWR(
+    return useSWRImmutable(
         () =>
             name && releaseDate
                 ? `${import.meta.env.VITE_IMDB_API_URL}/${

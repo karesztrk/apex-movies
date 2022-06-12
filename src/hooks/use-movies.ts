@@ -1,6 +1,6 @@
 import { Movie } from '@/components/search';
 import { apiFetcher } from '@/util/fetcher';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 interface Result {
     searchMovies: Movie[];
@@ -22,6 +22,5 @@ query SearchMovies($name: String!) {
 
 export const useMovies = (query: string) => {
     const fetchKey = query ? [searchMoviesQuery, query] : null;
-    console.log('🚀 ~ file: use-movies.ts ~ line 25 ~ useMovies ~ fetchKey', fetchKey);
-    return useSWR<Result>(fetchKey, (url, value) => apiFetcher(url, { name: value }));
+    return useSWRImmutable<Result>(fetchKey, (url, value) => apiFetcher(url, { name: value }));
 };

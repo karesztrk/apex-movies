@@ -1,5 +1,5 @@
 import { wikiFetcher } from '@/util/fetcher';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 export const useWiki = (name?: string) => {
     const params = {
@@ -14,5 +14,5 @@ export const useWiki = (name?: string) => {
 
     const searchParams = new URLSearchParams(params).toString();
 
-    return useSWR(() => (name ? `${import.meta.env.VITE_WIKI_API_URL}?${searchParams}` : null), wikiFetcher);
+    return useSWRImmutable(() => (name ? `${import.meta.env.VITE_WIKI_API_URL}?${searchParams}` : null), wikiFetcher);
 };
