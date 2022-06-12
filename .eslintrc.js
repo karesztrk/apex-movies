@@ -29,6 +29,7 @@ module.exports = {
         'plugin:react/recommended',
         'plugin:jsx-a11y/recommended',
         'plugin:prettier/recommended',
+        'plugin:@typescript-eslint/recommended',
     ],
     plugins: ['prettier'],
     rules: {

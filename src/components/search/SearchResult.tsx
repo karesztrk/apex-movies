@@ -49,50 +49,55 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
             .map((_, i) => <Skeleton key={i} variant="text" width="100%" />);
     };
 
-    const renderActions = () => (
-        <CardActions>
-            <Tooltip title="Search related movies">
+    const renderRelatedButton = () => (
+        <Tooltip title="Search related movies">
+            <IconButton color="secondary" aria-label="Search related movies" component="span" onClick={onRelatedClick}>
+                <SavedSearchIcon />
+            </IconButton>
+        </Tooltip>
+    );
+
+    const renderWikiButton = () =>
+        wiki === undefined ? (
+            <Skeleton variant="circular" width={25} height={25} />
+        ) : (
+            <Tooltip title="Go to Wikipedia">
                 <IconButton
+                    component={Link}
+                    target="_blank"
+                    rel="noreferrer"
                     color="secondary"
-                    aria-label="Search related movies"
-                    component="span"
-                    onClick={onRelatedClick}
+                    aria-label="Go to Wikipedia"
+                    href={`https://en.wikipedia.org/?curid=${wiki.pageid}`}
                 >
-                    <SavedSearchIcon />
+                    <PublicIcon />
                 </IconButton>
             </Tooltip>
-            {wiki === undefined ? (
-                <Skeleton variant="circular" width={25} height={25} />
-            ) : (
-                <Tooltip title="Go to Wikipedia">
-                    <IconButton
-                        component={Link}
-                        target="_blank"
-                        rel="noreferrer"
-                        color="secondary"
-                        aria-label="Go to Wikipedia"
-                        href={`https://en.wikipedia.org/?curid=${wiki.pageid}`}
-                    >
-                        <PublicIcon />
-                    </IconButton>
-                </Tooltip>
-            )}
-            {imdb === undefined ? (
-                <Skeleton variant="circular" width={25} height={25} />
-            ) : (
-                <Tooltip title="Go to IMDB">
-                    <IconButton
-                        component={Link}
-                        color="secondary"
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="Go to IMDB"
-                        href={`https://www.imdb.com/title/${imdb.id}`}
-                    >
-                        <MovieIcon />
-                    </IconButton>
-                </Tooltip>
-            )}
+        );
+
+    const renderImdbButton = () =>
+        imdb === undefined ? (
+            <Skeleton variant="circular" width={25} height={25} />
+        ) : (
+            <Tooltip title="Go to IMDB">
+                <IconButton
+                    component={Link}
+                    color="secondary"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Go to IMDB"
+                    href={`https://www.imdb.com/title/${imdb.id}`}
+                >
+                    <MovieIcon />
+                </IconButton>
+            </Tooltip>
+        );
+
+    const renderActions = () => (
+        <CardActions>
+            {renderRelatedButton()}
+            {renderWikiButton()}
+            {renderImdbButton}
         </CardActions>
     );
 
