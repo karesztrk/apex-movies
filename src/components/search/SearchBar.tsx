@@ -1,7 +1,7 @@
 import { useSearchContext } from '@/context/SearchContext';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { Chip, InputAdornment, OutlinedInput, Stack, styled } from '@mui/material';
-import { ChangeEvent, FC } from 'react';
+import { ChangeEvent, FC, useState } from 'react';
 
 interface SearchBarProps {
     value: string;
@@ -9,10 +9,13 @@ interface SearchBarProps {
     onChange?: (value: string) => void;
 }
 
-const SearchBar: FC<SearchBarProps> = ({ value, onChange: onChangeProp, placeholder }) => {
+const SearchBar: FC<SearchBarProps> = ({ value: valueProp, onChange: onChangeProp, placeholder }) => {
+    const [value, setValue] = useState(valueProp);
+
     const { selectedMovie, updateRelatedMode, updateSelectedMovie } = useSearchContext();
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
         if (onChangeProp) {
             onChangeProp(e.target.value);
         }
@@ -53,6 +56,8 @@ const SearchBar: FC<SearchBarProps> = ({ value, onChange: onChangeProp, placehol
             value={value}
             onChange={onChange}
             notched={false}
+            // Intedent behavior
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
         />
     );

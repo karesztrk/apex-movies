@@ -20,15 +20,15 @@ import { FC, PropsWithChildren, useState } from 'react';
 import { Movie } from '.';
 
 interface SearchResultProps {
-    movie: Movie;
+    data: Movie;
 }
 
-const SearchResult: FC<SearchResultProps> = ({ movie }) => {
+const SearchResult: FC<SearchResultProps> = ({ data }) => {
     const { updateRelatedMode, updateSelectedMovie, updateSearchQuery } = useSearchContext();
     const [open, setOpen] = useState(false);
 
-    const { data: wiki } = useWiki(open ? movie.name : undefined);
-    const { data: imdb } = useImdb(open ? movie.name : undefined, open ? new Date(movie.releaseDate) : undefined);
+    const { data: wiki } = useWiki(open ? data.name : undefined);
+    const { data: imdb } = useImdb(open ? data.name : undefined, open ? new Date(data.releaseDate) : undefined);
 
     const onClick = () => {
         setOpen(!open);
@@ -37,11 +37,11 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
     const onRelatedClick = () => {
         if (updateRelatedMode && updateSelectedMovie && updateSearchQuery) {
             updateRelatedMode(true);
-            updateSelectedMovie(movie);
+            updateSelectedMovie(data);
         }
     };
 
-    const rating = movie.score / 2;
+    const rating = data.score / 2;
 
     const renderSummarySkeleton = () => {
         return Array(3)
@@ -97,17 +97,17 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
         <CardActions>
             {renderRelatedButton()}
             {renderWikiButton()}
-            {renderImdbButton}
+            {renderImdbButton()}
         </CardActions>
     );
 
     return (
         <Wrapper>
             <CardActionArea onClick={onClick}>
-                <Poster image={movie.poster?.medium} alt="Movie poster" />
+                <Poster image={data.poster?.medium} alt="Movie poster" />
                 <CardContent>
-                    <Title>{movie.name}</Title>
-                    <Rating name="read-only" value={rating} readOnly />
+                    <Title>{data.name}</Title>
+                    {rating && <Rating name="read-only" value={rating} readOnly />}
                     {open && wiki === undefined ? renderSummarySkeleton() : <Summary>{wiki?.extract}</Summary>}
                 </CardContent>
             </CardActionArea>

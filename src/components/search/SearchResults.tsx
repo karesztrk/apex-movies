@@ -12,7 +12,7 @@ const SearchResults: FC<SearchResultsProps> = ({ data }) => {
         <Grid container spacing={4}>
             {data.map((entry) => (
                 <Grid item key={entry.id} xs={12} sm={6} md={4}>
-                    <SearchResult movie={entry} />
+                    <SearchResult data={entry} />
                 </Grid>
             ))}
         </Grid>

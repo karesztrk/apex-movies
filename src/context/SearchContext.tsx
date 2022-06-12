@@ -1,5 +1,5 @@
-import { Movie } from '@/components/search-results/SearchResults';
-import React, { createContext, PropsWithChildren, useContext, useMemo, useState } from 'react';
+import { Movie } from '@/components/search';
+import { createContext, PropsWithChildren, useContext, useMemo, useState } from 'react';
 
 interface ContextType {
     searchQuery: string;
