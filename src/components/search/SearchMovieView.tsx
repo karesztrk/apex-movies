@@ -11,12 +11,11 @@ const SearchMovieView = () => {
     const debouncedSearchQuery = useDebounce<string>(searchQuery, 1000);
 
     const { data } = useMovies(debouncedSearchQuery);
-    console.log('🚀 ~ file: SearchMovieView.tsx ~ line 13 ~ SearchMovieView ~ data', data);
 
     const loading = data === undefined && debouncedSearchQuery;
     return (
         <>
-            <SearchBar value={searchQuery} onChange={updateSearchQuery} />
+            <SearchBar value={searchQuery} onChange={updateSearchQuery} placeholder="Find your favourite movie" />
             {loading ? <ProgressBar /> : <SearchResults data={data?.searchMovies || []} />}
         </>
     );

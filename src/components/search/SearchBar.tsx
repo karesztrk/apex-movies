@@ -4,10 +4,11 @@ import { ChangeEvent, FC } from 'react';
 
 interface SearchBarProps {
     value: string;
+    placeholder?: string;
     onChange?: (value: string) => void;
 }
 
-const SearchBar: FC<SearchBarProps> = ({ value, onChange: onChangeProp }) => {
+const SearchBar: FC<SearchBarProps> = ({ value, onChange: onChangeProp, placeholder }) => {
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (onChangeProp) {
             onChangeProp(e.target.value);
@@ -16,7 +17,7 @@ const SearchBar: FC<SearchBarProps> = ({ value, onChange: onChangeProp }) => {
 
     return (
         <Input
-            placeholder="Find your favourite movie"
+            placeholder={placeholder}
             startAdornment={
                 <InputAdornment position="start">
                     <SearchIcon />

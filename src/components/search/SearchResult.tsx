@@ -1,7 +1,22 @@
 import { useSearchContext } from '@/context/SearchContext';
 import { useImdb } from '@/hooks/use-imdb';
 import { useWiki } from '@/hooks/use-wiki';
-import { Button, Card, CardActions, CardContent, CardMedia, Link, Rating, styled, Typography } from '@mui/material';
+import { SavedSearch as SavedSearchIcon, Public as PublicIcon, Movie as MovieIcon } from '@mui/icons-material';
+import {
+    Button,
+    Card,
+    CardActionArea,
+    CardActions,
+    CardContent,
+    CardMedia,
+    IconButton,
+    Link,
+    Rating,
+    Skeleton,
+    styled,
+    Tooltip,
+    Typography,
+} from '@mui/material';
 import { FC, PropsWithChildren, useState } from 'react';
 import { Movie } from '.';
 
@@ -16,7 +31,7 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
     const { data: wiki } = useWiki(open ? movie.name : undefined);
     const { data: imdb } = useImdb(open ? movie.name : undefined, open ? new Date(movie.releaseDate) : undefined);
 
-    const onTitleClick = () => {
+    const onClick = () => {
         setOpen(!open);
     };
 
@@ -29,28 +44,65 @@ const SearchResult: FC<SearchResultProps> = ({ movie }) => {
 
     const rating = movie.score / 2;
 
+    const renderSummarySkeleton = () => {
+        return Array(3)
+            .fill(0)
+            .map((_, i) => <Skeleton key={i} variant="text" width="100%" />);
+    };
+
     return (
         <Wrapper>
-            <CardMedia component="img" image={movie.poster?.medium} alt="Movie poster" />
-            <CardContent>
-                <Typography variant="h5" component="h2" onClick={onTitleClick}>
-                    {movie.name}
-                </Typography>
-                <Rating name="read-only" value={rating} readOnly />
-                {wiki?.extract && <Summary>{wiki?.extract}</Summary>}
-            </CardContent>
-            {(wiki?.pageid || imdb?.id) && (
+            <CardActionArea onClick={onClick}>
+                <Poster image={movie.poster?.medium} alt="Movie poster" />
+                <CardContent>
+                    <Title>{movie.name}</Title>
+                    <Rating name="read-only" value={rating} readOnly />
+                    {open && wiki === undefined ? renderSummarySkeleton() : <Summary>{wiki?.extract}</Summary>}
+                </CardContent>
+            </CardActionArea>
+            {open && (
                 <CardActions>
-                    <Button onClick={onRelatedClick}>Releated</Button>
-                    {wiki?.pageid && (
-                        <Link target="_blank" rel="noreferrer" href={`https://en.wikipedia.org/?curid=${wiki.pageid}`}>
-                            Wiki
-                        </Link>
+                    <Tooltip title="Search related movies">
+                        <IconButton
+                            color="secondary"
+                            aria-label="Search related movies"
+                            component="span"
+                            onClick={onRelatedClick}
+                        >
+                            <SavedSearchIcon />
+                        </IconButton>
+                    </Tooltip>
+                    {wiki === undefined ? (
+                        <Skeleton variant="circular" width={25} height={25} />
+                    ) : (
+                        <Tooltip title="Go to Wikipedia">
+                            <IconButton
+                                component={Link}
+                                target="_blank"
+                                rel="noreferrer"
+                                color="secondary"
+                                aria-label="Go to Wikipedia"
+                                href={`https://en.wikipedia.org/?curid=${wiki.pageid}`}
+                            >
+                                <PublicIcon />
+                            </IconButton>
+                        </Tooltip>
                     )}
-                    {imdb?.id && (
-                        <Link target="_blank" rel="noreferrer" href={`https://www.imdb.com/title/${imdb.id}`}>
-                            Imdb
-                        </Link>
+                    {imdb === undefined ? (
+                        <Skeleton variant="circular" width={25} height={25} />
+                    ) : (
+                        <Tooltip title="Go to IMDB">
+                            <IconButton
+                                component={Link}
+                                color="secondary"
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label="Go to IMDB"
+                                href={`https://www.imdb.com/title/${imdb.id}`}
+                            >
+                                <MovieIcon />
+                            </IconButton>
+                        </Tooltip>
                     )}
                 </CardActions>
             )}
@@ -66,8 +118,26 @@ const Wrapper = styled(({ children, className }: PropsWithChildren<{ className?:
     borderRadius: '0.75rem',
 }));
 
+const Poster = styled(
+    ({ className, image, alt }: PropsWithChildren<{ className?: string; image: string; alt: string }>) => (
+        <CardMedia component="img" className={className} image={image} alt={alt} />
+    ),
+)(() => ({
+    minHeight: '395px',
+}));
+
+const Title = styled(({ children, className }: PropsWithChildren<{ className?: string }>) => (
+    <Typography variant="h5" component="h2" className={className}>
+        {children}
+    </Typography>
+))(() => ({
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+}));
+
 const Summary = styled(Typography)(() => ({
-    textAlign: 'center',
+    textAlign: 'left',
     display: '-webkit-box',
     WebkitLineClamp: '5',
     WebkitBoxOrient: 'vertical',
