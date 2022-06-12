@@ -36,6 +36,7 @@ const CTA = styled(({ children, className }: PropsWithChildren<{ className?: str
     textAlign: 'center',
     color: 'inherit',
     fontWeight: 'bold',
+    marginBottom: '1rem',
 }));
 
 const Description = styled(({ children, className }: PropsWithChildren<{ className?: string }>) => (
@@ -43,6 +44,7 @@ const Description = styled(({ children, className }: PropsWithChildren<{ classNa
 ))(() => ({
     textAlign: 'center',
     color: 'inherit',
+    fontWeight: 300,
 }));
 
 const Hero = styled(Box)(({ theme }) => ({
