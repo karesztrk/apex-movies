@@ -14,8 +14,10 @@ export interface ImdbPage {
     description: string;
 }
 
-const apiFetcher = (query: RequestDocument, variables: unknown) =>
-    request(`${import.meta.env.VITE_API_URL}`, query, variables);
+const apiFetcher = (query: RequestDocument, variables: unknown) => {
+    console.log('calling');
+    return request(`${import.meta.env.VITE_API_URL}`, query, variables);
+};
 
 const wikiFetcher = (url: string): Promise<WikiPage> => {
     return fetch(url)

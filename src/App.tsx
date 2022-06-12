@@ -1,12 +1,12 @@
 import Main from './components/main/Main';
 import { SearchProvider } from './context/SearchContext';
 
-export default function App() {
+const App = () => {
     return (
         <SearchProvider>
-            {/* <Header /> */}
             <Main />
-            {/* <Footer /> */}
         </SearchProvider>
     );
-}
+};
+
+export default App;

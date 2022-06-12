@@ -6,10 +6,6 @@ interface Result {
     searchMovies: Movie[];
 }
 
-interface QueryVariables {
-    name: string;
-}
-
 const searchMoviesQuery = `
 query SearchMovies($name: String!) {
   searchMovies(query: $name) {
@@ -25,10 +21,7 @@ query SearchMovies($name: String!) {
 `;
 
 export const useMovies = (query: string) => {
-    const variables: QueryVariables = {
-        name: query,
-    };
-
-    const fetchKey = query ? [searchMoviesQuery, variables] : null;
-    return useSWR<Result>(fetchKey, apiFetcher);
+    const fetchKey = query ? [searchMoviesQuery, query] : null;
+    console.log('🚀 ~ file: use-movies.ts ~ line 25 ~ useMovies ~ fetchKey', fetchKey);
+    return useSWR<Result>(fetchKey, (url, value) => apiFetcher(url, { name: value }));
 };
